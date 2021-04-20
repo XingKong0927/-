@@ -1,0 +1,2 @@
+# BigLearning_statistics
+因为要给不懂代码的人使用，所以采用了Nuitka进行打包
