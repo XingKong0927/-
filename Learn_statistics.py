@@ -32,10 +32,10 @@ if __name__=='__main__':
     print("———————————————————————  程序开始  ———————————————————————")
     print("重要提示：请将导出文件放入本程序解压目录 data文件夹 中 ！！！")
 
-    # import time
     import datetime
     import os
     import pandas as pd
+    from progress.bar import Bar
 
 
     file_name = input("\n请输入大学习系统导出文件名称（eg：161830245419导出数据）：")
@@ -56,24 +56,16 @@ if __name__=='__main__':
     data11 = pd.read_csv("source\\第n期大学习参与率排名.csv", engine = 'python')
     data12 = pd.DataFrame(data = data11)
     
-    # 进度条代码(python可用，输出到命令行会出问题)
-    # len_bar = 100           # 进度条长度
-    # len_data10 = len(data10)
-    # beishu = int(len_data10/len_bar)
-    # start = time.perf_counter()
-    for row0 in range(len(data10)):
-        # # 进度条代码
-        # a='*'*int(row0/beishu)
-        # b='.'*int((len_data10-row0)/beishu)
-        # c=(row0/len_data10)*100
-        # dur=time.perf_counter()-start
-        # print("\r正在处理参与率排名：{:^3.0f}%[{}->{}]{:.2f}s".format(c,a,b,dur), end="")
-        
+    len_data10 = len(data10)
+    bar1 = Bar('正在处理参与率排名：', max=len_data10, fill='>', suffix='%(percent)d%%')      # 进度条
+    for row0 in range(len_data10):
+        bar1.next()
         branch0 = data10[row0]
         for row1 in range(len(data12)):
             if branch0 == data12.loc[row1]['所属组织']:
                 data12.loc[row1, '第n期大学习参与人数'] += 1
                 break
+    bar1.finish()
     for row1 in range(len(data12)):
         data12.loc[row1, '第n期大学习参与率'] = '{:.2%}'.format(data12.loc[row1]['第n期大学习参与人数']/data12.loc[row1]['团员数'])
     data12.columns = ['所属组织', '团员数', '第{}期大学习参与人数'.format(time_stage), '第{}期大学习参与率'.format(time_stage)]      # 更换表头
@@ -87,8 +79,9 @@ if __name__=='__main__':
     data22 = pd.DataFrame(data = data21)
 
     len_data22 = len(data22)
+    bar2 = Bar('正处理个人学习情况：', max=len_data22, fill='>', suffix='%(percent)d%%')      # 进度条
     for row in range(len_data22):
-
+        bar2.next()
         id_card = data22.loc[row]['证件号码']
         name = data22.loc[row]['姓名']
         sign = 0
@@ -100,6 +93,7 @@ if __name__=='__main__':
             data22.loc[row, '学习情况'] = '已学习'
         else:
             data22.loc[row, '学习情况'] = '未学习'
+    bar2.finish()
     data23 = data22.drop(['证件号码'], axis=1)
     # data23.to_excel("m季n期学习情况.xlsx", index = None)
 
